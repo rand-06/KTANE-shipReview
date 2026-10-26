@@ -2,12 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class template : MonoBehaviour
+public class shipReviewScript : MonoBehaviour
 {
     //public KMBombInfo Bomb;
     public KMAudio Audio;
@@ -189,7 +187,7 @@ public class template : MonoBehaviour
     private int preffered = -1;
     private string buttonFunctions = "01234.56789";
     
-void Awake()
+    void Awake()
     {
         ModuleId = ModuleIdCounter++;
         for (int i = 0; i < 5; i++)
@@ -213,7 +211,7 @@ void Awake()
     {
         if (enteredAnswer == expectedAnswer)
         {
-            if (stage == 5)
+            if (stage == 4)
             {
                 GetComponent<KMBombModule>().HandlePass();
                 pair[0].GetComponent<MeshRenderer>().material.mainTexture = null;
@@ -272,7 +270,7 @@ void Awake()
             int sum = 0;
             for (int i = 0; i < 5; i++)
                 sum+=Math.Abs(pairOfPerson(a,b,i));
-            if (sum > 4 && sum<99) midans = pairOfPerson(a,b,0);
+            if (sum > 3) midans = pairOfPerson(a,b,0);
         }
         return new[] { a, b };
     }
@@ -284,17 +282,24 @@ void Awake()
         string ans = num / 1000 + (num % 1000 < 10 ? ".00" : num % 1000 < 100 ? ".0" : ".") + num % 1000;
         return (num0<0?"-":"+") + ans;
     }
+
+    string listToString(List<sbyte> list)
+    {
+        string ans = "[";
+        for (int i = 0; i < list.Count; i++) ans += list[i] + ((i==list.Count-1)?"]":", ");
+        return ans;
+    }
     
     void generateOneStage()
     {
         stage++;
-        stageCounter.text = stage + " / 5";
+        stageCounter.text = stage + " / 4";
         int[] pairStage = getRandomPair();
         if (Rnd.Range(0, 20) < 8) preffered = Rnd.Range(0, 5);
         else preffered = -1;
         for (int i = 0; i < 5; i++)
         {
-            people[i].GetComponent<MeshRenderer>().material.color = (i==preffered)?new Color(1, 1, 1):new Color(.5f,.5f,.5f);
+            people[i].GetComponent<MeshRenderer>().material.color = (i==preffered)?new Color(1, 1, 1):new Color(.2f,.2f,.2f);
         }
         List<sbyte> list = new List<sbyte>();
         for (int i = 0; i < 5; i++)
@@ -307,7 +312,8 @@ void Awake()
             }
         }
         decimal ans = Averages.Average(list, stage);
-        expectedAnswer = floatToString(ans);
+        expectedAnswer = ans==-20? "-9.999":floatToString(ans);
+        Debug.LogFormat("[Ship Review #{0}] Stage {1}. List of rates: {2}", ModuleId, stage, listToString(list));
         Debug.LogFormat("[Ship Review #{0}] Expected answer for {2}({4})/{3}({5}) is: {1}", 
             ModuleId, expectedAnswer,names[pairStage[0]],names[pairStage[1]],pairStage[0],pairStage[1]
             );

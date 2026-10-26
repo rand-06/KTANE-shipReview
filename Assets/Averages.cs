@@ -17,8 +17,7 @@ public class Averages
             case 1: return MedianAverage(values);
             case 2: return ArithmeticMean(values);
             case 3: return TrimmedMean(values);
-            case 4: return SignedRMS(values);
-            case 5: return HuberMeanOneIter(values);
+            case 4: return HuberMeanOneIter(values);
             default: return 0;
         }
     }
@@ -44,22 +43,6 @@ public class Averages
         decimal sum = 0;
         foreach (var v in sorted) sum += v;
         return sum / sorted.Count;
-    }
-    
-    public static decimal SignedRMS(List<sbyte> values)
-    {
-        decimal sumSq = 0;
-        decimal sum = 0;
-        foreach (var v in values)
-        {
-            sumSq += v * v;
-            sum += v;
-        }
-        double meanSq = (double)sumSq / values.Count;
-        decimal rms = (decimal)Math.Sqrt(meanSq);
-        if (sum > 0) return rms;
-        if (sum < 0) return -rms;
-        return 0; // ровно ноль
     }
     
     public static decimal HuberMeanOneIter(List<sbyte> values)
